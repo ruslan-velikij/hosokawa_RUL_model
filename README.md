@@ -148,6 +148,20 @@ python -m venv venv
 .\venv\Scripts\Activate.ps1
 ```
 
+Установить и добавить 7-Zip в путь:
+
+1. Установить 7-Zip, например, в C:\Program Files\7-Zip\7z.exe;
+2. Добавить 7-Zip в путь:
+
+```powershell
+[Environment]::SetEnvironmentVariable(
+  "Path",
+  [Environment]::GetEnvironmentVariable("Path", "User") + ";C:\Program Files\7-Zip",
+  "User"
+)
+```
+3. Перезапустить оболочку.
+
 Установить зависимости:
 
 ```powershell

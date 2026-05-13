@@ -2,7 +2,10 @@
 /toir_hosokawa/*
 /results/*
 /venv
+/_tmp_unpack_MSZ
+/models/4_1_link_events_to_timeseries.py.bak
 !/processed/.gitkeep
 !/toir_hosokawa/.gitkeep
 !/results/.gitkeep
 !/results/hosokawa_experiment_comparison.xlsx
+
