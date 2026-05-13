@@ -1,0 +1,8 @@
+/processed/*
+/toir_hosokawa/*
+/results/*
+/venv
+!/processed/.gitkeep
+!/toir_hosokawa/.gitkeep
+!/results/.gitkeep
+!/results/hosokawa_experiment_comparison.xlsx
