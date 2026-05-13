@@ -48,12 +48,12 @@ python hosokawa_RUL_models.py
 ```text
 hosokawa_RUL_model/
 ├──_diagnostics/
-    ├── 1_rows_and_columns.py
-    ├── 2_1_base_analisys.py
-    ├── 2_2_check_dt.py
-    ├── 2_3_check_duplicates.py
-    ├── 2_5_check_N_Hosokawa.py
-    └── check_valkispeed_granulatorspeed.py
+│   ├── 1_rows_and_columns.py
+│   ├── 2_1_base_analisys.py
+│   ├── 2_2_check_dt.py
+│   ├── 2_3_check_duplicates.py
+│   ├── 2_5_check_N_Hosokawa.py
+│   └── check_valkispeed_granulatorspeed.py
 ├── hosokawa_RUL_models.py
 ├── models/
 │   ├── 2_4_remove_full_duplicates.py
@@ -587,7 +587,5 @@ run_commands.txt
 
 ## Краткий вывод
 
-```text
 В рамках проекта построен полный конвейер подготовки данных и обучения моделей для прогнозирования приближения технических событий оборудования Hosokawa. Лучший основной результат получен для узла мельницы на базовом датасете при использовании событий класса «Неисправность/отказ» и реальных технологических признаков. Для компактора более полезным оказался SSD-датасет, так как дополнительные признаки `ValkiSpeed` и `GranulatorSpeed` улучшают описание работы зоны валков и грануляции.
-````
 
