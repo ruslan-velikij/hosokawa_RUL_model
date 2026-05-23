@@ -24,7 +24,7 @@ UNIT_COL = "N_Hosokawa"
 DATE_START_COL = "Дата/время начала простоя"
 EVENT_ID_COL = "№ обр"
 EVENT_CLASS_COL = "event_class"
-EVENT_CLASS_FILTER: Optional[list[str]] = None
+EVENT_CLASS_FILTER: Optional[list[str]] = ["Неисправность/отказ"]
 
 LABEL_COLUMNS = [
     "event_in_24h",
