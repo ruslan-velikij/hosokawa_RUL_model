@@ -22,7 +22,8 @@ hosokawa_RUL/
 1. По желанию распаковывает основной архив MSZ.zip.
 2. По желанию удаляет полные дубли из базового и SSD parquet.
 3. По желанию запускает обработку журналов ТОИР.
-4. Запускает выбранный эксперимент 1–7.
+4. По желанию запускает выбранные эксперименты 1–7.
+5. По желанию запускает дополнительный RUL-анализ скриптами 5_1–5_4.
 """
 
 from __future__ import annotations
@@ -527,7 +528,31 @@ EXPERIMENTS = {
 }
 
 
-def choose_and_run_experiments() -> None:
+RUL_ANALYSIS_STEPS = [
+    {
+        "name": "Анализ интервалов между отказами",
+        "script": "5_1_analyze_failure_intervals.py",
+        "args": [],
+    },
+    {
+        "name": "RUL-регрессия по календарному времени до отказа",
+        "script": "5_2_train_rul_regressor.py",
+        "args": [],
+    },
+    {
+        "name": "Анализ ложных срабатываний классификационной модели",
+        "script": "5_3_analyze_false_alarms.py",
+        "args": [],
+    },
+    {
+        "name": "Расчет рабочих часов до отказа",
+        "script": "5_4_calculate_operating_hours_to_failure.py",
+        "args": [],
+    },
+]
+
+
+def choose_and_run_experiments() -> bool:
     print_header("4. Выбор эксперимента")
 
     print("Доступные сценарии:")
@@ -540,7 +565,7 @@ def choose_and_run_experiments() -> None:
 
     if not choice or choice in {"n", "no", "нет"}:
         print("Запуск экспериментов пропущен.")
-        return
+        return False
 
     if choice == "all":
         keys = list(EXPERIMENTS.keys())
@@ -553,6 +578,55 @@ def choose_and_run_experiments() -> None:
 
     for key in keys:
         EXPERIMENTS[key]["func"]()
+
+    return True
+
+
+def maybe_run_experiments() -> bool:
+    print_header("4. Эксперименты модели")
+
+    if not ask_yes_no("4) Запустить эксперименты модели?", default="n"):
+        print("Эксперименты модели пропущены.")
+        return False
+
+    return choose_and_run_experiments()
+
+
+def run_rul_analysis() -> None:
+    print_header("5. Дополнительный RUL-анализ")
+
+    RUN_LOG.clear()
+
+    print("Будут последовательно запущены сценарии:")
+    for index, step in enumerate(RUL_ANALYSIS_STEPS, start=1):
+        print(f"{index}. {step['name']} — {step['script']}")
+
+    print()
+    print(
+        "Для корректной работы RUL-анализа должны быть подготовлены файлы "
+        "processed/*_dataset_labeled.parquet, processed/*_train_prepared.parquet, "
+        "processed/*_test_prepared.parquet и результаты классификации с threshold-метриками."
+    )
+
+    for step in RUL_ANALYSIS_STEPS:
+        print_header(f"RUL-анализ: {step['name']}")
+        run_python_script(step["script"], step["args"])
+
+    log_path = RESULTS_DIR / "rul_analysis_run_commands.txt"
+    log_path.write_text("\n".join(RUN_LOG) + "\n", encoding="utf-8")
+    print()
+    print(f"Лог команд RUL-анализа сохранен: {log_path}")
+
+
+def maybe_run_rul_analysis(default: str = "n") -> bool:
+    print_header("5. Анализ RUL")
+
+    if not ask_yes_no("5) Запустить дополнительный RUL-анализ скриптами 5_1–5_4?", default=default):
+        print("RUL-анализ пропущен.")
+        return False
+
+    run_rul_analysis()
+    return True
 
 
 def main() -> None:
@@ -580,7 +654,12 @@ def main() -> None:
     else:
         print("Обработка журналов пропущена.")
 
-    choose_and_run_experiments()
+    experiments_ran = maybe_run_experiments()
+
+    # Если эксперименты не запускались, чаще всего пользователь хочет перейти сразу к RUL-анализу.
+    # Поэтому для такого случая значение по умолчанию — "y". После экспериментов RUL-анализ
+    # тоже предлагается, но по умолчанию не запускается, чтобы случайно не начать долгий расчет.
+    maybe_run_rul_analysis(default="n" if experiments_ran else "y")
 
     print_header("Готово")
     print("Работа управляющего скрипта завершена.")
