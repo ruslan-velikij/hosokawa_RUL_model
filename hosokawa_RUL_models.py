@@ -161,6 +161,12 @@ def clean_processed_intermediate_files() -> None:
     removed: list[str] = []
 
     for item in sorted(PROCESSED_DIR.iterdir(), key=lambda p: p.name):
+        # Служебный файл для сохранения пустой папки processed в git.
+        # Его нельзя удалять при очистке промежуточных результатов.
+        if item.name == ".gitkeep":
+            kept.append(item.name)
+            continue
+
         if is_processed_base_file(item):
             kept.append(item.name)
             continue
